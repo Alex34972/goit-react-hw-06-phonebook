@@ -1,22 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actions from './redux/actions';
 import shortid from 'shortid';
+import { connect } from 'react-redux';
 import ContactForm from './components/contactForm';
 import Filter from './components/filter';
 import ContactList from './components/contactList';
-export default function Phonebook() {
-  const [contacts, setContacts] = useState(
-    () => JSON.parse(window.localStorage.getItem('contacts')) ?? [],
-  );
+
+function Phonebook() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [filter, setFilter] = useState('');
   const nameInputId = shortid.generate();
   const numberInputId = shortid.generate();
-  const id = shortid.generate();
 
-  useEffect(() => {
-    window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const contacts = useSelector(state => state.contacts.items);
+  const filter = useSelector(state => state.contacts.filter);
+  const dispatch = useDispatch();
 
   const handleChange = event => {
     const { name, value } = event.target;
@@ -26,6 +25,9 @@ export default function Phonebook() {
         break;
       case 'number':
         setNumber(value);
+        break;
+      case 'filter':
+        dispatch(actions.filterContacts(value));
         break;
       default:
         console.error();
@@ -38,27 +40,23 @@ export default function Phonebook() {
   };
 
   const handleAppend = () => {
-    const contactNew = { id, name, number };
-    const find = contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase(),
-    );
-
-    find === undefined
-      ? setContacts(state => (state = [contactNew, ...contacts]))
-      : alert(`${name} is alredy in contact`);
+    if (contacts.find(item => item.name === name)) {
+      alert(`${name} is already in contacts`);
+      reset();
+      return;
+    }
+    dispatch(actions.addContact({ name, number }));
     reset();
   };
-  const getСontactSearch = event => {
-    setFilter(event.target.value);
-  };
+
   const getFilterContacts = () => {
     const normalizeFilter = filter.toLowerCase();
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizeFilter),
     );
   };
-  const deletContact = id => {
-    setContacts(state => state.filter(contact => contact.id !== id));
+  const deletContact = contactId => {
+    dispatch(actions.deleteContact(contactId));
   };
   return (
     <div>
@@ -72,8 +70,15 @@ export default function Phonebook() {
         numberId={numberInputId}
       />
       <h2>Contacts</h2>
-      <Filter filter={filter} onChange={getСontactSearch} />
+      <Filter filter={filter} onChange={handleChange} />
       <ContactList contacts={getFilterContacts()} onDelete={deletContact} />
     </div>
   );
 }
+//const mapStateToProps = state =>{
+//  return{
+//    contacts:state.contacts
+//  }
+//}
+
+export default connect()(Phonebook);
