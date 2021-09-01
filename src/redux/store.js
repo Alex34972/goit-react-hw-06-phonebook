@@ -11,14 +11,14 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import contatsReduser from './reduser';
+import contactsReduser from './reduser';
 
 const persistConfig = {
   key: 'contacts',
   storage,
   blacklist: ['filter'],
 };
-const persistedReducer = persistReducer(persistConfig, contatsReduser);
+const persistedReducer = persistReducer(persistConfig, contactsReduser);
 const store = configureStore({
   reducer: {
     contacts: persistedReducer,
