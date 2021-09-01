@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from './redux/actions';
 import shortid from 'shortid';
-import { connect } from 'react-redux';
 import ContactForm from './components/contactForm';
 import Filter from './components/filter';
 import ContactList from './components/contactList';
 
-function Phonebook() {
+export default function Phonebook() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const nameInputId = shortid.generate();
@@ -75,10 +74,3 @@ function Phonebook() {
     </div>
   );
 }
-//const mapStateToProps = state =>{
-//  return{
-//    contacts:state.contacts
-//  }
-//}
-
-export default connect()(Phonebook);
