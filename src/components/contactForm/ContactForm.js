@@ -1,14 +1,47 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import shortid from 'shortid';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actions from '../../redux/actions';
 import s from './ContactForm.module.css';
-const ContactForm = ({
-  name,
-  number,
-  onChange,
-  onHandleAppend,
-  nameId,
-  numberId,
-}) => {
+
+const ContactForm = () => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const nameInputId = shortid.generate();
+  const numberInputId = shortid.generate();
+  const contacts = useSelector(state => state.contacts.items);
+  const dispatch = useDispatch();
+
+  const handleChange = event => {
+    const { name, value } = event.target;
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+
+      default:
+        console.error();
+        return;
+    }
+  };
+  const reset = () => {
+    setName('');
+    setNumber('');
+  };
+
+  const handleAppend = () => {
+    if (contacts.find(item => item.name === name)) {
+      alert(`${name} is already in contacts`);
+      reset();
+      return;
+    }
+    dispatch(actions.addContact({ name, number }));
+    reset();
+  };
+
   return (
     <form className={s.forma}>
       <p className={s.title}>Name</p>
@@ -20,8 +53,8 @@ const ContactForm = ({
         title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
         required
         value={name}
-        id={nameId}
-        onChange={onChange}
+        id={nameInputId}
+        onChange={handleChange}
       />
       <p className={s.title}>Number</p>
       <input
@@ -32,21 +65,14 @@ const ContactForm = ({
         title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
         required
         value={number}
-        id={numberId}
-        onChange={onChange}
+        id={numberInputId}
+        onChange={handleChange}
       />
-      <button className={s.formBtn} type="button" onClick={onHandleAppend}>
+      <button className={s.formBtn} type="button" onClick={handleAppend}>
         Add contact
       </button>
     </form>
   );
 };
-ContactForm.propTypes = {
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onHandleAppend: PropTypes.func.isRequired,
-  nameId: PropTypes.string.isRequired,
-  numberId: PropTypes.string.isRequired,
-};
+
 export default ContactForm;

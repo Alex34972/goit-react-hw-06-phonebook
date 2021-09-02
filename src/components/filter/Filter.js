@@ -1,7 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import * as actions from '../../redux/actions';
 import s from './Filter.module.css';
-const Filter = ({ filter, onChange }) => {
+
+const Filter = () => {
+  const dispatch = useDispatch();
+  const onFilter = event =>
+    dispatch(actions.filterContacts(event.target.value));
+
   return (
     <label className={s.filter}>
       Find contacts by name
@@ -12,15 +17,10 @@ const Filter = ({ filter, onChange }) => {
         pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
         title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
         required
-        value={filter}
-        onChange={onChange}
+        onChange={onFilter}
       />
     </label>
   );
 };
 
-Filter.propTypes = {
-  filter: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
 export default Filter;

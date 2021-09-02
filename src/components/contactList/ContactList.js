@@ -1,7 +1,22 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import * as actions from '../../redux/actions';
 import s from './ContactList.module.css';
-const ContactList = ({ contacts, onDelete }) => {
+
+const ContactList = () => {
+  const dispatch = useDispatch();
+  const deletContact = contactId => {
+    dispatch(actions.deleteContact(contactId));
+  };
+  const getFilterContacts = state => {
+    const { filter, items } = state.contacts;
+    const normalizedFilter = filter.toLowerCase();
+    return items.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter),
+    );
+  };
+
+  const contacts = useSelector(getFilterContacts);
   return (
     <ul className={s.ContactList}>
       {contacts.map(
@@ -13,7 +28,7 @@ const ContactList = ({ contacts, onDelete }) => {
               <button
                 className={s.contactBtn}
                 type="button"
-                onClick={() => onDelete(id)}
+                onClick={() => deletContact(id)}
               >
                 Delete
               </button>
